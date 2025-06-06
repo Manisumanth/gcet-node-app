@@ -50,7 +50,7 @@ app.post("/login", (req, res, next) => {
       return res.status(401).json({ message: "User not found" });
     }
     return res.json({ ...found, token: "123" });
-  } catch (err) {
+  } catch (err) { 
     next(err);
   }
 });
