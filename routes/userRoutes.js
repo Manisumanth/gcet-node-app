@@ -1,12 +1,16 @@
 import express from 'express'
 import userModel from "../models/userModel.js";
+import bcrypt from 'bcryptjs';
+import jwt from "jsonwebtoken";
 
 const userRouter = express.Router()
 
 userRouter.post("/register", async (req, res) => {
   const { name, email, pass } = req.body;
+  
   try {
-    const result = await userModel.create({ name, email, pass });
+    const hashpassword = await bcrypt.hash(pass, 10);
+    const result = await userModel.create({ name, email, pass:hashpassword });
     res.json({ message: "User registered successfully", user: result });
   } catch (err) {
     console.error("Registration error:", err);
@@ -18,11 +22,13 @@ userRouter.post("/login", async (req, res) => {
   const result = await userModel.findOne({ email, pass });
 
   if (!result) return res.json({ message: "Invalid User or Password" });
+  const token = jwt.sign({email: result.email, id: result_id }, SECRET_KEY);
 
   return res.json({
     token: "dummy_token_123", 
     name: result.name,
-    email: result.email
+    email: result.email,
+    pass: hashpassword
   });
 });
 
